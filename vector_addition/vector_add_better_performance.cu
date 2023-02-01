@@ -32,14 +32,22 @@ int main(void)
 {
     int N = 1 << 16;  //vector size (65536)
     int size = N*sizeof(int);
-    int *a,*b,*c; //unified memory pointers
+    int *h_a, *h_b, *h_c; //host vector
+    int *d_a, *d_b, *d_c; //device vector
+ 
+    h_a = new int[N];
+    h_b = new int[N];
+    h_c = new int[N];
   
-    cudaMallocManaged(&a, size);
-    cudaMallocManaged(&b, size);
-    cudaMallocManaged(&c, size);
+    cudaMalloc(&d_a, size);
+    cudaMalloc(&d_b, size);
+    cudaMalloc(&d_c, size);
 
-    init_vector(a,N);
-    init_vector(b,N);
+    init_vector(h_a,N);
+    init_vector(h_b,N);
+
+    cudaMemcpy(d_a,h_a,size,cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b,h_b,size,cudaMemcpyHostToDevice);
 
     int devId;
     cudaGetDevice(&devId);
@@ -49,24 +57,16 @@ int main(void)
     const int NUM_THREADS = props.maxThreadsPerBlock;
     const int NUM_BLOCKS = props.multiProcessorCount;
 
-    /*
-      Unified memory gets fetched on-demand by page fault.
-      However, if a programmer explicitly writes cudaMemPrefetchAsync when page fault is obvious, 
-      the unified memory gets transferred ahead of time, which can improve performance.
-    */
-    cudaMemPrefetchAsync(a,size,devId); //Host to Device
-    cudaMemPrefetchAsync(b,size,devId); //Host to Device
-    cudaMemPrefetchAsync(c,size,devId); //Host to Device
-    vectorAdd<<<NUM_BLOCKS,NUM_THREADS>>>(a,b,c,N);
-    
-    cudaDeviceSynchronize();  //prevents race condition
+    vectorAdd<<<NUM_BLOCKS,NUM_THREADS>>>(d_a,d_b,d_c,N);
+    cudaMemcpy(h_c, d_c, size, cudaMemcpyDeviceToHost);
 
-    cudaMemPrefetchAsync(c,size,cudaCpuDeviceId); //Host to Device
-    if(verifier(a,b,c,N) == SUCCESS) std::cout<<"YAY!";
+    if(verifier(h_a,h_b,h_c,N) == SUCCESS) std::cout<<"YAY!";
     else std::cout << "Hmm..";
-
-    cudaFree(a);
-    cudaFree(b);
-    cudaFree(c);
-    return 0;
+ 
+    delete[] h_a;
+    delete[] h_b;
+    delete[] h_c;
+    cudaFree(d_a);
+    cudaFree(d_b);
+    cudaFree(d_c);
 }
