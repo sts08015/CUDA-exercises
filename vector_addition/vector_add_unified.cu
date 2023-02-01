@@ -61,7 +61,7 @@ int main(void)
     
     cudaDeviceSynchronize();  //prevents race condition
 
-    cudaMemPrefetchAsync(c,size,cudaCpuDeviceId); //Host to Device
+    cudaMemPrefetchAsync(c,size,cudaCpuDeviceId); //Device to Host
     if(verifier(a,b,c,N) == SUCCESS) std::cout<<"YAY!";
     else std::cout << "Hmm..";
 
