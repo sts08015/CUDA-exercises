@@ -4,31 +4,31 @@
 
 enum {FAIL, SUCCESS};
 
-__global__ void vectorAdd(int* vec1,int* vec2, int* res, int size)
+__global__ void vectorAdd(int* vec1,int* vec2, int* res, int len)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if(idx < size) res[idx] = vec1[idx] + vec2[idx];
+    if(idx < len) res[idx] = vec1[idx] + vec2[idx];
 }
 
-void init_vector(int* vec,const int size)
+void init_vector(int* vec,const int len)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dis(0, 99);
     
-    for(int i=0;i<size;i++) vec[i] = dis(gen);
+    for(int i=0;i<len;i++) vec[i] = dis(gen);
 }
 
-int verifier(int* vec1, int* vec2, int* res, int size)
+int verifier(int* vec1, int* vec2, int* res, int len)
 {
-    for(int i=0;i<size;i++)
+    for(int i=0;i<len;i++)
     {
         if(vec1[i]+vec2[i] != res[i]) return FAIL;
     }
     return SUCCESS;
 }
 
-int main()
+int main(void)
 {
     int N = 1 << 16;  //vector size (65536)
     int size = N*sizeof(int);
