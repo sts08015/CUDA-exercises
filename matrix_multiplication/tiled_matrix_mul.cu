@@ -85,7 +85,6 @@ int main(void)
 
   init_matrix(h_a,element_num);
   init_matrix(h_b,element_num);
-  init_matrix(h_c,element_num);
 
   int *d_a, *d_b, *d_c;
   cudaMalloc(&d_a,size);
