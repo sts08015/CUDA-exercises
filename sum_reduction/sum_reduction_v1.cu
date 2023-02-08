@@ -59,7 +59,7 @@ int main(void)
   cudaMemcpy(d_v, h_v, size, cudaMemcpyHostToDevice);
 
   int TB_SIZE = SIZE;
-  int GRID_SIZE = (int)ceil(n/TB_SIZE);
+  int GRID_SIZE = (int)ceil((float)n/TB_SIZE);
 
   sum_reduction <<<GRID_SIZE, TB_SIZE>>> (d_v, d_result);
   sum_reduction <<<1, GRID_SIZE>>> (d_result, d_result);

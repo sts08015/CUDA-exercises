@@ -100,7 +100,7 @@ int main(void)
   cudaGetDeviceProperties(&props, devId);
   
   const int BLOCK_SIZE = (int)sqrt(props.maxThreadsPerBlock); //32
-  const int GRID_SIZE = (int)ceil(n/BLOCK_SIZE);  //32
+  const int GRID_SIZE = (int)ceil((float)n/BLOCK_SIZE);  //32
 
   dim3 grid(GRID_SIZE,GRID_SIZE);
   dim3 threads(BLOCK_SIZE,BLOCK_SIZE);

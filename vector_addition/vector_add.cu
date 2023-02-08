@@ -50,7 +50,7 @@ int main(void)
     cudaMemcpy(d_b,h_b,size,cudaMemcpyHostToDevice);
 
     const int NUM_THREADS = 64;
-    const int NUM_BLOCKS = (int)ceil(N/NUM_THREADS);
+    const int NUM_BLOCKS = (int)ceil((float)N/NUM_THREADS);
 
     vectorAdd<<<NUM_BLOCKS,NUM_THREADS>>>(d_a,d_b,d_c,N);
     cudaMemcpy(h_c, d_c, size, cudaMemcpyDeviceToHost);
