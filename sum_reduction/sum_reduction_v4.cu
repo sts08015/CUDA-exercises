@@ -15,10 +15,15 @@ void init(int* vec,const int len)
 __global__ void sum_reduction(int* v, int* result)
 {
   __shared__ int partial_sum[SIZE];
+  
+  /*
+  	IDEA: Halve the number of blocks, and replace single load with two loads and first add of the reduction
+  	Why halve the number of blocks, not threads/block? --> each block is allocated to SM and we want to fully utilize each SM
+  	
+	Still Remaining Problem : When the loop approaches the end, a lot of threads are just spinning in the loop and do nothing. --> waste of warps
+  */
 
-  //IDEA: Halve the number of blocks, and replace single load with two loads and first add of the reduction
-  //Why halve the number of blocks, not threads/block? --> each block is allocated to SM and we want to fully utilize each SM
-  // Load elements and do first add of reduction
+  //Load elements and do first add of reduction
   int tid = blockIdx.x * blockDim.x * 2 + threadIdx.x;
   partial_sum[threadIdx.x] = v[tid] + v[tid + blockDim.x];
   __syncthreads();
