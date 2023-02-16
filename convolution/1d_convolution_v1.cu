@@ -16,6 +16,7 @@ int verifier(int *arr,int *mask, int *res,int n,int m)
     {
       if(s+j >=0 && s+j < n) tmp += arr[s+j] * mask[j];
     }
+    if(tmp != res[i]) return FAIL;
   }
 
   return SUCCESS;
@@ -73,10 +74,9 @@ int main(void)
   int THREADS = 256;
   int GRID = (int)ceil((float)n/THREADS);
 
-  cudaMemcpy(h_result,d_result,size_n,cudaMemcpyDeviceToHost);
-
   convolution_1d <<< GRID, THREADS>>>(d_array,d_mask,d_result,n,m);
 
+  cudaMemcpy(h_result,d_result,size_n,cudaMemcpyDeviceToHost);
   int val = verifier(h_arr,h_mask,h_result,n,m);
 
   if(val == SUCCESS) std::cout << "YAY!!" << std::endl;
