@@ -1,5 +1,3 @@
-%%writefile histogram1.cu
-
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
